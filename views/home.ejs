@@ -1,0 +1,44 @@
+<!-- views/index.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OCR Application</title>
+  <link rel="stylesheet" href="/style.css"> 
+  <script type="text/javascript">
+    function previewImage(event) {
+       var input = event.target;
+       var image = document.getElementById('preview-image');
+       if (input.files && input.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function(e) {
+             image.src = e.target.result;
+          }
+          reader.readAsDataURL(input.files[0]);
+       }
+    }
+ </script>
+</head>
+<body>
+  <div class="column first-column">
+    <!-- Content for the first column goes here -->
+    <h2>First Column</h2>
+    <!-- Add any content you want in the first column -->
+  </div>
+
+  <div class="column second-column">
+    <!-- Content for the second column goes here -->
+    <h2>Second Column - Image Upload</h2>
+    
+    <form class="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+      <input type="file" name="image" accept="image/*" onchange="previewImage(event)" required>
+      <button type="submit">Upload Image</button>
+    </form>
+
+    <img id="preview-image" >
+
+  </div>
+</body>
+</html>

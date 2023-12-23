@@ -1,0 +1,40 @@
+/* public/styles.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+  }
+  
+  .column {
+    flex: 1;
+    overflow: hidden;
+  }
+  
+  .first-column {
+    flex: 1;
+    width: 25%;
+    background-color: #f2f2f2;
+    padding: 20px;
+  }
+  
+  .second-column {
+    flex: 3;
+    width: 75%;
+    padding: 20px;
+  }
+  
+  .upload-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  #preview-image {
+    max-width: 100%;
+    max-height: 300px;
+    margin-top: 20px;
+  }
+  

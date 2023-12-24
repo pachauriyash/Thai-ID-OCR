@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thai ID OCR</title>
+  <link rel="stylesheet" href="/style2.css"> 
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body>
+    <h2 style="margin-top: 15px;">Edit Record</h2>
+    <form id="edit-form" action="/edit/<%= record._id %>" method="post">
+      <div>
+        <label for="identificationNumber">Identification Number:</label>
+        <input type="text" id="identificationNumber" name="identificationNumber" value="<%= record.identification_number %>" required>
+      </div>
+  
+      <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="<%= record.name %>"  required>
+      </div>
+  
+      <div>
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName" value="<%= record.lastName %>" required>
+      </div>
+  
+      <div>
+        <label for="dateOfBirth">Date of Birth:</label>
+        <input type="date" id="dateOfBirth" name="dateOfBirth" value="<%= record.date_of_birth %>">
+      </div>
+  
+      <div>
+        <label for="dateOfExpiry">Date of Expiry:</label>
+        <input type="date" id="dateOfExpiry" name="dateOfExpiry" value="<%= record.date_of_expiry %>" >
+      </div>
+  
+      <div>
+        <label for="dateOfIssue">Date of Issue:</label>
+        <input type="date" id="dateOfIssue" name="dateOfIssue" value="<%= record.date_of_issue %>" >
+      </div>
+    <div style="text-align: center;">
+        <button type="submit">Confirm Edit</button>
+    </div>
+      
+    </form>
+</body>
+</html>

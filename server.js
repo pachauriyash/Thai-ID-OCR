@@ -22,11 +22,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+const decodedkey = Buffer.from(process.env.PRIVATE_KEY, 'base64').toString('utf-8');
+const decodedKeyWithBreaks = decodedkey.replace(/\\n/g, '\n');
 //setup for Google vision API
 const CONFIG={
     credentials:{
         client_email:process.env.CLIENT_EMAIL,
-        private_key:process.env.PRIVATE_KEY.split(String.raw`\n`).join('\n'),
+        private_key:decodedKeyWithBreaks,
     }
 }
 //setup client for for google vision API

@@ -10,7 +10,8 @@ const Card = require('./models/card');
 const app = express();
 
 // Connect to MongoDB using Mongoose
-mongoose.connect('mongodb://localhost:27017/thai-id-ocr');
+// mongoose.connect('mongodb://localhost:27017/thai-id-ocr');
+mongoose.connect(process.env.MONGO_URI,{useNewUrlParser:true});
 
 // Set EJS as the view engine
 app.set('view engine', 'ejs');

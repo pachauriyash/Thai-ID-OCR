@@ -13,11 +13,11 @@
   <nav class="navbar">
     <div class="navbar-title">Thai-ID-OCR</div>
     <div class="navbar-filters">
-      <input type="date" id="dateFilter" onchange="applyFilters()">
-      <select id="statusFilter" onchange="applyFilters()">
-        <option value="">All</option>
-        <option value="success">Success</option>
-        <option value="failure">Failure</option>
+      <input type="date" id="dateFilter" onchange="filterCards()" >
+      <select id="statusFilter" onchange="filterCards()">
+        <option value="All">All</option>
+        <option value="Valid">Success</option>
+        <option value="Invalid">Failure</option>
       </select>
     </div>
   </nav>
@@ -31,7 +31,7 @@
           <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
           <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
         </svg>
-      Select Id Card<input type="file" name="image" accept="image/*" style="display: none;" onchange="previewImage(event)" required>
+      Select Id Card<input type="file" name="image"  accept="image/jpeg, image/jpg, image/png" style="display: none;" onchange="validateFile(event)" required>
       </label>
       <button type="submit" class="btn btn-secondary">Upload Image</button>
     </form>
@@ -45,7 +45,7 @@
       <!-- For each loop to iterate over previousCards and display them accordingly -->
       <% if (previousCards && previousCards.length > 0) { %>
         <% previousCards.forEach(card => { %>
-          <li class="card-item" data-card='<%= JSON.stringify(card) %>' onclick="toggleCardDetails(this)">
+          <li class="card-item <%=card.status %> <%= card.timestamp %>" data-card='<%= JSON.stringify(card) %>' onclick="toggleCardDetails(this)">
             <div style="display: flex; justify-content: space-between;">
               <div>
                 <strong>Name: </strong> <%= card.name %>,
@@ -89,10 +89,39 @@
   </div>
 
   <script type="text/javascript">
+    //filter cards based on date and status
+function filterCards() {  
+    var cardss = document.getElementsByClassName('card-item');
+    var dateFilter = document.getElementById('dateFilter').value;
+    console.log(dateFilter);
+    var statusFilter = document.getElementById('statusFilter').value;
+    for (var i = 0; i < cardss.length; i++) {
 
-    function applyFilters() {
-      // Implement filter logic based on date and status
+        if (dateFilter===" " || (cardss[i].classList.contains(dateFilter) && (cardss[i].classList.contains(statusFilter) || statusFilter === 'All'))) {
+            cardss[i].style.display = '';
+        } else {
+            cardss[i].style.display = 'none';
+        }
     }
+}
+
+    //validate the image size and type
+    function validateFile(event) {
+      const input = event.target;
+      const fileSize = input.files[0].size; // in bytes
+      const maxSize = 2 * 1024 * 1024; // 2MB
+
+      if (fileSize > maxSize) {
+        alert('File size exceeds the limit of 2MB. Please choose a smaller file.');
+        input.value = ''; // Clear the input
+        return;
+      }
+      else{
+        previewImage(event);
+      }
+  }
+
+
     // Preview the image after selecting and before uploading
     function previewImage(event) {
       var input = event.target;
@@ -140,6 +169,23 @@
        window.location.href = "/";
       });
     }
+
+    //  formatDate function to set default date
+    function formatDate(inputDate) {
+      const date = new Date(inputDate);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${year}-${month}-${day}`;
+    } 
+    // Function to set the date input value to today's date on page load
+    function setDefaultDate() {
+      const dateFilter = document.getElementById('dateFilter');
+      dateFilter.value = formatDate(new Date());
+    }
+    // Call the setDefaultDate function when the page loads
+    window.onload = setDefaultDate;
+
   </script>
 </body>
 </html>

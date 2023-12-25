@@ -93,19 +93,41 @@ const validate = (data) => {
 
 
 //Routes for the application
+//to format the date to find it in relevant format for filtering
+function formatDate(inputDate) {
+    const date = new Date(inputDate);
+  
+    // Get day, month, and year components
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+  
+    // Construct the formatted date string in YYYY-MM-DD format
+    const formattedDate = `${year}-${month}-${day}`;
+  
+    return formattedDate;
+}
 // Home page get route
 app.get('/', async (req, res) => {
     try {
         // Get all cards with active status true
         const ocrRecords = await Card.find({ activestatus: true });
         // console.log(ocrRecords);
+        // Format timestamps using formatDate function
+        const formattedRecords = ocrRecords.map(record => {
+            return {
+                ...record.toObject(),  // Convert Mongoose document to plain JavaScript object
+                timestamp: formatDate(record.timestamp)
+            };
+        });
         // Render home page with ocrRecords in reverse order or basically latest to oldest
-        res.render('home', { previousCards: ocrRecords.reverse() });
+        res.render('home', { previousCards: formattedRecords.reverse() });
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
 });
+
 //Function to convert the dates format to the ones required in form to edit the record
 const formatToYYYYMMDD = (dateString) => {
     const [day, month, year] = dateString.split('/');
@@ -133,7 +155,7 @@ app.get('/edit/:id', async (req, res) => {
     }
 }
 );
-//function to convert the dates format from the updaret form to the ones required in database
+//function to convert the dates format from the update form to the ones required in database
 const formatToDDMMYYYY = (dateString) => {
     const [year, month, day] = dateString.split('-');
     return `${day}/${month}/${year}`;
@@ -206,7 +228,8 @@ app.post('/upload', upload.single('image'), async (req, res) => {
         6. Similarly, locate and extract the dateofbirth and dateofexpiry based on their respective indicators.
         7. Date formats should be in dd/mm/yyyy; if the format is inconsistent or incomplete, mark the field as "NOT FOUND."
         8. If a category (name, last name, date-of-birth, date-of-issue, date-of-expiry) is not immediately followed by the relevant information, mark that field as "NOT FOUND."
-        9. Return the data strictly in the following format as a JSON OBJECT and handle errors as explicitly mentioned above:
+        9. Date_of_Issue would be written just before the text "Date of Issue" similarly Date_of_Expiry would be written one line before the text "Date of Expiry" so make sure you detect the correct date.
+        10. Return the data strictly in the following format as a JSON OBJECT and handle errors as explicitly mentioned above:
             - Identification_Number: 1digit 4digits 5digits 2digits 1digit (separated by spaces)
             - Name: Followed by any salutation (e.g., Miss, Mr.) the term "name"
             - Last_Name: Followed by the term "last name"
@@ -214,13 +237,14 @@ app.post('/upload', upload.single('image'), async (req, res) => {
             - Date_of_Issue: dd/mm/yyyy format (if it is 1/1/yyyy then append 0 before to make it like 01/01/yyyy)
             - Date_of_Expiry: dd/mm/yyyy format (if it is 1/1/yyyy then append 0 before to make it like 01/01/yyyy)
             - Title_of_the_Card: Thai National ID Card (or any other title mentioned)
-        10. IMPORTANT: If you get input ocr text as "No text detected", return all the fields as "NOT FOUND".
+        11. IMPORTANT: If you get input ocr text as "No text detected", return all the fields as "NOT FOUND".
         Use natural language understanding to recognize relevant information from the OCR text.
             ` },
         ],
             model: "gpt-3.5-turbo",
           }); 
-
+          //13. For Date of issue the year is in Buddhist/Thai calendar year so convert it to the Gregorian calendar year by subtracting 543 from the Buddhist Era year to get the equivalent year in the Common Era (CE)  when extracting the date. 
+          // 12.Explicitly mention that if you're unsure about years in all the dates then convert the years in all the dates from Buddhist/Thai calendar year to the Normal calendar year when extracting the dates.
         // Return the extracted text as JSON response
         const cardobject = {
             name: JSON.parse(completion.choices[0].message.content).Name,

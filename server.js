@@ -227,22 +227,22 @@ app.post('/upload', upload.single('image'), async (req, res) => {
         { role: "user", content: `Analyse the scanned OCR text and provide the following information in JSON format:
 
         
-        **Example of understanding the text:**
-        unsguvu Thai National ID Card (Note: This is the Title of the Card)
-        0 1234 56789 10 1   (Note: This is the Identification Number)
+        ** This is just the Example for understanding the text and don't send it as default output and rather find it from Scanned OCR text and handle cases mentioned in instructions:**
+        unsguvu Thai National ID Card (Note: This is where the Title of the Card is found and if you don't find such title in Scanned OCR text then fill the field as "NOT FOUND")
+        X XXXX XXXXX XX X   (Note: This is where the Identification Number is found)
         laussonandssunVU
         Identification Number
         azonna
         2300
-        2 11.A. 2566
+        2 11.A. YYYY (NOTE: in thai/buddhist calender format)
         Tuantas
-        2 Jan 2023 (Note: This is the Date of Issue)
+        DD MONTH YYYY (Note: This is where the Date of Issue is found)
         Date of Issue
         šn
-        Mr. Meenoy (Note: This is the Name which might usually be followed by 'Name' text)
-        Koyruk (Note: This is the Last Name which might usually be followed by 'Last Name' text)
-        14 J.A. 2523
-        Date of Birth 14 Jan 1980 (Note: This is the Date of Birth)
+        Mr. XXXX (Note: This is where the Name which might usually be followed by 'Name' text is found)
+        XXXX (Note: This is where the Last Name which might usually be followed by 'Last Name' text is found)
+        14 J.A. YYYY (NOTE: in thai/buddhist calender format)
+        Date of Birth DD MONTH YYYY (Note: This is where the Date of Birth is found)
         na
         ..20007
         Name
@@ -252,14 +252,14 @@ app.post('/upload', upload.single('image'), async (req, res) => {
         180-
         170
         160
-        1 1.A. 2573
+        1 1.A. YYYY (NOTE: in thai/buddhist calender format)
         TA
-        1 Jan 2032 (Note: This is the Date of Expiry)
+        DD MONTH YYYY (Note: This is where the Date of Expiry is found)
         Date of Expiry 
         180
         170
         160
-
+        **Note: The above written text is just an example of how the text might look like and to help you understand better where the information is. So don't send it as default output for random text inputs and don't send the above example as output in case of non relevant OCR text. Handle the edge cases and NOT FOUND cases in such unit test cases based on below Scanned OCR text**
         **Scanned OCR text:**
         ${extractedText}
 

@@ -26,7 +26,7 @@ const upload = multer({ storage: storage });
 const CONFIG={
     credentials:{
         client_email:process.env.CLIENT_EMAIL,
-        private_key:process.env.PRIVATE_KEY,
+        private_key:process.env.PRIVATE_KEY.split(String.raw`\n`).join('\n'),
     }
 }
 //setup client for for google vision API

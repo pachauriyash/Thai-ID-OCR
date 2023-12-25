@@ -89,7 +89,7 @@ const validate = (data) => {
         errors.title_of_the_card = 'Invalid card type';
         status = false;
     }
-
+    
     return { status, error: errors };
 };
 
@@ -192,8 +192,15 @@ app.post('/edit/:id', async (req, res) => {
         if (req.body.dateOfBirth) {
             existingRecord.date_of_birth = formatToDDMMYYYY(req.body.dateOfBirth);
         }
+
+        // Validate the updated record
+        const validation = validate(existingRecord);
+
+        existingRecord.status = validation.status ? 'Valid' : 'Invalid';
+        existingRecord.errorcomment = validation.status ? { message: "Error resolved" } : validation.error;
         // Save the updated record
         await existingRecord.save();
+
         // Redirect to home page
         res.redirect('/');
     } catch (error) {
@@ -211,7 +218,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 
         // Extract relevant information from the OCR result and also consider error handling
         const extractedText = result ? result.description : 'No text detected';
-
+        // console.log(extractedText);
         // Use OpenAI chatgpt 3.5 turbo model to analyse and parse the data from the scanned text and give relevant output
         const completion = await openai.chat.completions.create({
             messages: [{ role: "system", 
@@ -219,13 +226,47 @@ app.post('/upload', upload.single('image'), async (req, res) => {
         },
         { role: "user", content: `Analyse the scanned OCR text and provide the following information in JSON format:
 
+        
+        **Example of understanding the text:**
+        unsguvu Thai National ID Card (Note: This is the Title of the Card)
+        0 1234 56789 10 1   (Note: This is the Identification Number)
+        laussonandssunVU
+        Identification Number
+        azonna
+        2300
+        2 11.A. 2566
+        Tuantas
+        2 Jan 2023 (Note: This is the Date of Issue)
+        Date of Issue
+        šn
+        Mr. Meenoy (Note: This is the Name which might usually be followed by 'Name' text)
+        Koyruk (Note: This is the Last Name which might usually be followed by 'Last Name' text)
+        14 J.A. 2523
+        Date of Birth 14 Jan 1980 (Note: This is the Date of Birth)
+        na
+        ..20007
+        Name
+        Last Name
+        ( )
+        A
+        180-
+        170
+        160
+        1 1.A. 2573
+        TA
+        1 Jan 2032 (Note: This is the Date of Expiry)
+        Date of Expiry 
+        180
+        170
+        160
+
         **Scanned OCR text:**
         ${extractedText}
-        
+
         **Instructions:**
         1. Read the provided OCR text and extract the information as specified below.
         2. If unable to recognize data for a specific field, write "NOT FOUND" in that field.
-        3. Maintain accuracy and precision in extraction. Also you'll have previous outputs so maintain consistency with you structuring.
+        3. Maintain accuracy and precision in extraction and keep the structuring strictly withing rules. Also you'll have previous outputs so maintain consistency with you structuring.
         4. Ensure that the name includes any salutation (e.g., Miss, Mr.) mentioned in the text.
         5. Identify the date of issue located just before the term "dateofissue."
         6. Similarly, locate and extract the dateofbirth and dateofexpiry based on their respective indicators.
@@ -233,9 +274,9 @@ app.post('/upload', upload.single('image'), async (req, res) => {
         8. If a category (name, last name, date-of-birth, date-of-issue, date-of-expiry) is not immediately followed by the relevant information, mark that field as "NOT FOUND."
         9. Date_of_Issue would be written just before the text "Date of Issue" similarly Date_of_Expiry would be written one line before the text "Date of Expiry" so make sure you detect the correct date.
         10. Return the data strictly in the following format as a JSON OBJECT and handle errors as explicitly mentioned above:
-            - Identification_Number: 1digit 4digits 5digits 2digits 1digit (separated by spaces)
-            - Name: Followed by any salutation (e.g., Miss, Mr.) the term "name"
-            - Last_Name: Followed by the term "last name"
+            - Identification_Number: 1digit 4digits 5digits 2digits 1digit (separated by spaces) and if you don't find such identification number with the required rules then fill the field as "NOT FOUND"
+            - Name: Followed by any salutation (e.g., Miss, Mr.) the term "Name" and if it is not followed by term "Name" then fill the field as "NOT FOUND"
+            - Last_Name: Followed by the term "Last name" and if it is not followed by term "Last name" then fill the field as "NOT FOUND"
             - Date_of_Birth: dd/mm/yyyy format (if it is 1/1/yyyy then append 0 before to make it like 01/01/yyyy)
             - Date_of_Issue: dd/mm/yyyy format (if it is 1/1/yyyy then append 0 before to make it like 01/01/yyyy)
             - Date_of_Expiry: dd/mm/yyyy format (if it is 1/1/yyyy then append 0 before to make it like 01/01/yyyy)
@@ -246,8 +287,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
         ],
             model: "gpt-3.5-turbo",
           }); 
-          //13. For Date of issue the year is in Buddhist/Thai calendar year so convert it to the Gregorian calendar year by subtracting 543 from the Buddhist Era year to get the equivalent year in the Common Era (CE)  when extracting the date. 
-          // 12.Explicitly mention that if you're unsure about years in all the dates then convert the years in all the dates from Buddhist/Thai calendar year to the Normal calendar year when extracting the dates.
+
         // Return the extracted text as JSON response
         const cardobject = {
             name: JSON.parse(completion.choices[0].message.content).Name,
@@ -258,6 +298,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
             date_of_birth: JSON.parse(completion.choices[0].message.content).Date_of_Birth,
             Title_of_the_Card: JSON.parse(completion.choices[0].message.content).Title_of_the_Card,
         };
+        // console.log(cardobject);
         // Validate the extracted data for further checks of accuracy and precision
         const validation = validate(cardobject);
 
@@ -275,7 +316,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
         });
         // Save the new card to the database
         await newCard.save();
-        console.log(newCard);
+        // console.log(newCard);
         //Redirect to home page to display the latest upto date records and this new one as well
         res.redirect('/');
         

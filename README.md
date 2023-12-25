@@ -1,6 +1,6 @@
 # Live link for the project
 
-**Note:** This app is hosted on render.com, and its free tier is being used, so it might take a minute for the server to spin up initially.
+**Note:** This app is hosted on render.com, and its free tier is being used, so it might take **a minute for the server to spin up initially**. Also the previous scanned cards can be found at date 25-12-2023 at the time of hosting the site as the default date on rendering will be current date so might show no previous record due to that filter initially.
 
 https://thai-id-ocr-j8ui.onrender.com
 

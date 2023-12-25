@@ -76,3 +76,13 @@ body {
 .card-details button:hover {
   background-color: #c0392b;
 }
+
+footer {
+  background-color: #3498db;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+
+  bottom: 0;
+  width: 100%;
+}

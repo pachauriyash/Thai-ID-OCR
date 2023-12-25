@@ -21,7 +21,10 @@ body {
   display: flex;
   gap: 10px;
 }
-
+h2, h6 {
+  display: inline-block;
+  margin-right: 10px; /* Adjust the margin as needed */
+}
 
 .previous-cards-section {
   margin: 20px;

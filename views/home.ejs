@@ -13,6 +13,7 @@
   <nav class="navbar">
     <div class="navbar-title">Thai-ID-OCR</div>
     <div class="navbar-filters">
+      <h5>Filters: </h5>
       <input type="date" id="dateFilter" onchange="filterCards()" >
       <select id="statusFilter" onchange="filterCards()">
         <option value="All">All</option>
@@ -40,7 +41,7 @@
 
   <!-- Previous Scanned Cards Section -->
   <div class="previous-cards-section">
-    <h2>Previous Scanned Cards</h2>
+    <h2>Previous Scanned Cards</h2> <h6>  Sorted: Latest to Oldest</h3>
     <ol >
       <!-- For each loop to iterate over previousCards and display them accordingly -->
       <% if (previousCards && previousCards.length > 0) { %>

@@ -22,9 +22,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+//setup for Google vision API
 const decodedkey = Buffer.from(process.env.PRIVATE_KEY, 'base64').toString('utf-8');
 const decodedKeyWithBreaks = decodedkey.replace(/\\n/g, '\n');
-//setup for Google vision API
 const CONFIG={
     credentials:{
         client_email:process.env.CLIENT_EMAIL,
@@ -93,10 +93,8 @@ const validate = (data) => {
     return { status, error: errors };
 };
 
-
-
-//Routes for the application
-//to format the date to find it in relevant format for filtering
+//Some additional functions required for formatting the dates in endpoints
+// -To format the date to find it in relevant format for filtering
 function formatDate(inputDate) {
     const date = new Date(inputDate);
   
@@ -110,6 +108,20 @@ function formatDate(inputDate) {
   
     return formattedDate;
 }
+// -Function to convert the dates format to the ones required in form to edit the record
+const formatToYYYYMMDD = (dateString) => {
+    const [day, month, year] = dateString.split('/');
+    return `${year}-${month}-${day}`;
+};
+
+//function to convert the dates format from the update form to the ones required in database
+const formatToDDMMYYYY = (dateString) => {
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+};
+
+//Routes for the application
+
 // Home page get route
 app.get('/', async (req, res) => {
     try {
@@ -131,11 +143,6 @@ app.get('/', async (req, res) => {
     }
 });
 
-//Function to convert the dates format to the ones required in form to edit the record
-const formatToYYYYMMDD = (dateString) => {
-    const [day, month, year] = dateString.split('/');
-    return `${year}-${month}-${day}`;
-  };
 
 //get route for edit page
 app.get('/edit/:id', async (req, res) => {
@@ -158,11 +165,7 @@ app.get('/edit/:id', async (req, res) => {
     }
 }
 );
-//function to convert the dates format from the update form to the ones required in database
-const formatToDDMMYYYY = (dateString) => {
-    const [year, month, day] = dateString.split('-');
-    return `${day}/${month}/${year}`;
-};
+// Post route for edit page which is basically Edit endpoint
 app.post('/edit/:id', async (req, res) => {
     try {
         // Get the record by id
@@ -210,7 +213,7 @@ app.post('/edit/:id', async (req, res) => {
 }
 );
 
-// Image upload and OCR processing route and creating the OCR record
+// Image upload and OCR processing route and creating the OCR record which is basically Creat endpoint
 app.post('/upload', upload.single('image'), async (req, res) => {
     try {
         // Process the uploaded file with Google Vision API
@@ -326,7 +329,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     }
 });
 
-//Route/API endpoint for soft deleting a record
+// Route/API endpoint for soft deleting a record
 app.delete('/delete-record/:id', async (req, res) => {
     try {
         const recordId = req.params.id;
